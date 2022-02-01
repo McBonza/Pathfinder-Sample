@@ -186,6 +186,7 @@ void AStarPather::smooth() {
     third = getWorldPosParent(third);
     second = getWorldPosParent(second);
     first = getWorldPosParent(first);
+
     //DO ALL THE THREES IN THE MIDDLE
     while (first != terrain->get_world_position(start.row, start.col)) {
         smoothedParents.push_back(third);
@@ -203,18 +204,7 @@ void AStarPather::smooth() {
     //DO ONE BEFORE LAST THREE
     smoothedParents.push_back(third);
     for (float s = 0.75f; s > 0.0f; s -= 0.25f) {
-        newPoint = Vec3::CatmullRom(first, second, third, fourth, s);
-        smoothedParents.push_back(newPoint);
-    }
-
-    //DO LAST THREE
-    smoothedParents.push_back(second);
-    fourth = getWorldPosParent(fourth);
-    third = getWorldPosParent(third);
-    second = getWorldPosParent(second);
-    for (float s = 0.75f; s > 0.0f; s -= 0.25f)
-    {
-        newPoint = Vec3::CatmullRom(first, second, third, fourth, s);
+        newPoint = Vec3::CatmullRom(first, first, third, fourth, s);
         smoothedParents.push_back(newPoint);
     }
     smoothedParents.push_back(first);
@@ -395,8 +385,11 @@ PathResult AStarPather::compute_path(PathRequest& request)
                 mPathStackCOL.push(pos.col);
                 pos = grid[pos.parentRow][pos.parentCol];
             }
-            mPathStackROW.push(pos.row); // push the start
-            mPathStackCOL.push(pos.col ); // push the start
+           // mPathStackROW.push(pos.row); // push the start
+           // mPathStackCOL.push(pos.col ); // push the start
+
+            request.path.push_back(request.start);
+
             while (!mPathStackROW.empty())
             {
                 request.path.push_back(terrain->get_world_position(mPathStackROW.top(), mPathStackCOL.top()));
